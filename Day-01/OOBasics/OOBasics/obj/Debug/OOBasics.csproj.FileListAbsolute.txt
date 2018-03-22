@@ -1,0 +1,6 @@
+D:\Nasdaq-C#-Mar-2018\OOBasics\OOBasics\bin\Debug\OOBasics.exe.config
+D:\Nasdaq-C#-Mar-2018\OOBasics\OOBasics\bin\Debug\OOBasics.exe
+D:\Nasdaq-C#-Mar-2018\OOBasics\OOBasics\bin\Debug\OOBasics.pdb
+D:\Nasdaq-C#-Mar-2018\OOBasics\OOBasics\obj\Debug\OOBasics.csprojResolveAssemblyReference.cache
+D:\Nasdaq-C#-Mar-2018\OOBasics\OOBasics\obj\Debug\OOBasics.exe
+D:\Nasdaq-C#-Mar-2018\OOBasics\OOBasics\obj\Debug\OOBasics.pdb
