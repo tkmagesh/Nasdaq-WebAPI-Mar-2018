@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
-namespace MyCollectionAPI
+namespace IEnumerableExtensionsDemo
 {
     public class Product
     {
@@ -22,82 +23,16 @@ namespace MyCollectionAPI
 
     public static class MyExtensions
     {
-        public static void ApplyDiscount(this Product product, decimal percentage)
+        /*
+        public static void Sort<T>(this IEnumerable<T> list, IItemComparer<T> comparer)
         {
-            product.Cost = product.Cost - ((product.Cost * percentage) / 100);
-        }
-    }
-    /*
-    public class ProductsCollection : IEnumerator, IEnumerable
-    {
-        private ArrayList list = new ArrayList();
-
-        public void Add(Product product)
-        {
-            list.Add(product);
-        }
-        public void Remove(int index)
-        {
-            list.RemoveAt(index);
-        }
-        
-        public Product Get(int index)
-        {
-            return (Product)list[index];
-        }
-        
-        public Product this[int index]
-        {
-            get
-            {
-                return (Product)list[index];
-            }
-        }
-        public int Count
-        {
-            get
-            {
-                return list.Count;
-            }
-        }
-
-        //IEnumerable Members
-        private int index = -1;
-        public object Current
-        {
-            get { return this.list[this.index];  }
-        }
-
-        public bool MoveNext()
-        {
-            ++this.index;
-            if (this.index >= list.Count)
-            {
-                this.Reset();
-                return false;
-            }
-            return true;
-        }
-
-        public void Reset()
-        {
-            this.index = -1;
-        }
-
-        //IEnumerator Member
-        public IEnumerator GetEnumerator()
-        {
-            return this;
-        }
-
-        public void Sort()
-        {
-            for(var i=0; i < this.list.Count-1; i++)
+            
+            for (var i = 0; i < list.Count - 1; i++)
                 for (var j = i + 1; j < this.list.Count; j++)
                 {
-                    var p1 = (Product) this.list[i];
-                    var p2 = (Product) this.list[j];
-                    if (p1.Id > p2.Id)
+                    var p1 = (T)this.list[i];
+                    var p2 = (T)this.list[j];
+                    if (comparer.Compare(p1, p2) > 0)
                     {
                         var temp = this.list[i];
                         this.list[i] = this.list[j];
@@ -106,29 +41,13 @@ namespace MyCollectionAPI
                 }
         }
 
-        public void Sort(IProductComparer comparer)
+        public void Sort(ItemCompareDelegate<T> comparer)
         {
             for (var i = 0; i < this.list.Count - 1; i++)
                 for (var j = i + 1; j < this.list.Count; j++)
                 {
-                    var p1 = (Product)this.list[i];
-                    var p2 = (Product)this.list[j];
-                    if ( comparer.Compare(p1, p2) > 0)
-                    {
-                        var temp = this.list[i];
-                        this.list[i] = this.list[j];
-                        this.list[j] = temp;
-                    }
-                }
-        }
-
-        public void Sort(ProductCompareDelegate comparer)
-        {
-            for (var i = 0; i < this.list.Count - 1; i++)
-                for (var j = i + 1; j < this.list.Count; j++)
-                {
-                    var p1 = (Product)this.list[i];
-                    var p2 = (Product)this.list[j];
+                    var p1 = (T)this.list[i];
+                    var p2 = (T)this.list[j];
                     if (comparer(p1, p2) > 0)
                     {
                         var temp = this.list[i];
@@ -137,33 +56,58 @@ namespace MyCollectionAPI
                     }
                 }
         }
-        public ProductsCollection Filter(IProductCriteria criteria)
+         */ 
+        public static IEnumerable<T> Filter<T>(this IEnumerable<T> list, IItemCriteria<T> criteria)
         {
-            var result = new ProductsCollection();
-            foreach (var item in this.list)
+
+            foreach (var item in list)
             {
-                var product = (Product)item;
-                if (criteria.IsSatisfiedBy(product))
-                    result.Add(product);
+                var tItem = (T)item;
+                if (criteria.IsSatisfiedBy(tItem))
+                    yield return tItem;
             }
-            return result;
+
         }
 
-        public ProductsCollection Filter(ProductCriteriaDelegate criteria)
+        //public static IEnumerable<T> Filter<T>(this IEnumerable<T> list, ItemCriteriaDelegate<T> criteria)
+        //public static IEnumerable<T> Filter<T>(this IEnumerable<T> list, Func<T, bool> criteria)
+        public static IEnumerable<T> Filter<T>(this IEnumerable<T> list, Predicate<T> criteria)
         {
-            var result = new ProductsCollection();
-            foreach (var item in this.list)
+            foreach (var item in list)
             {
-                var product = (Product)item;
-                if (criteria(product))
-                    result.Add(product);
+                var tItem = (T)item;
+                if (criteria(tItem))
+                    yield return tItem;
+            }
+
+        }
+
+        //public static IDictionary<TKey, List<T>> GroupBy<T, TKey>(this IEnumerable<T> list, KeySelectorDelegate<T, TKey> keySelector)
+        /*public static IDictionary<TKey, List<T>> GroupBy<T, TKey>(this IEnumerable<T> list, Func<T, TKey> keySelector)
+        {
+            var result = new Dictionary<TKey, List<T>>();
+            foreach (var item in list)
+            {
+                var tItem = (T)item;
+                var key = keySelector(tItem);
+                if (!result.ContainsKey(key))
+                {
+                    result.Add(key, new List<T>());
+                }
+                result[key].Add(tItem);
             }
             return result;
+        }*/
+
+        public static void ForEach<T>(this IEnumerable<T> list, Action<T> action)
+        {
+            foreach (var item in list)
+                action(item);
         }
     }
-    */
+   
 
-    public class MyCollection<T> : IEnumerator, IEnumerable
+    public class MyCollection<T> : IEnumerator, IEnumerable, IEnumerable<T>, IEnumerator<T>
     {
         private ArrayList list = new ArrayList();
 
@@ -225,7 +169,7 @@ namespace MyCollectionAPI
             return this;
         }
 
-       
+
 
         public void Sort(IItemComparer<T> comparer)
         {
@@ -243,7 +187,8 @@ namespace MyCollectionAPI
                 }
         }
 
-        public void Sort(ItemCompareDelegate<T> comparer)
+        //public void Sort(ItemCompareDelegate<T> comparer)
+        public void Sort(Func<T,T, int> comparer)
         {
             for (var i = 0; i < this.list.Count - 1; i++)
                 for (var j = i + 1; j < this.list.Count; j++)
@@ -258,47 +203,27 @@ namespace MyCollectionAPI
                     }
                 }
         }
-        public IEnumerable<T> Filter(IItemCriteria<T> criteria)
+       
+
+       
+
+        T IEnumerator<T>.Current
         {
-            
-            foreach (var item in this.list)
-            {
-                var tItem = (T)item;
-                if (criteria.IsSatisfiedBy(tItem))
-                    yield return tItem;
-            }
-            
+            get { return (T) this.Current; }
         }
 
-        public IEnumerable<T>  Filter(ItemCriteriaDelegate<T> criteria)
+        public void Dispose()
         {
-            foreach (var item in this.list)
-            {
-                var tItem = (T)item;
-                if (criteria(tItem))
-                    yield return tItem;
-            }
-            
+            //throw new NotImplementedException();
         }
 
-        public IDictionary<TKey, List<T>> GroupBy<TKey>(KeySelectorDelegate<T, TKey> keySelector)
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
-            var result = new Dictionary<TKey, List<T>>();
-            foreach (var item in this.list)
-            {
-                var tItem = (T)item;
-                var key = keySelector(tItem);
-                if (!result.ContainsKey(key))
-                {
-                    result.Add(key, new List<T>());
-                }
-                result[key].Add(tItem);
-            }
-            return result;
+            return this;
         }
     }
 
-    public delegate TKey KeySelectorDelegate<T, TKey>(T item);
+    //public delegate TKey KeySelectorDelegate<T, TKey>(T item);
 
     public class CostlyProductCriteria : IItemCriteria<Product>
     {
@@ -327,9 +252,9 @@ namespace MyCollectionAPI
     {
         bool IsSatisfiedBy(T item);
     }
-    public delegate bool ProductCriteriaDelegate(Product product);
+    //public delegate bool ProductCriteriaDelegate(Product product);
 
-    public delegate bool ItemCriteriaDelegate<T>(T item);
+    //public delegate bool ItemCriteriaDelegate<T>(T item);
 
     public interface IProductComparer
     {
@@ -341,9 +266,9 @@ namespace MyCollectionAPI
         int Compare(T p1, T p2);
     }
 
-    public delegate int ProductCompareDelegate(Product p1, Product p2);
+    //public delegate int ProductCompareDelegate(Product p1, Product p2);
 
-    public delegate int ItemCompareDelegate<T>(T p1, T p2);
+    //public delegate int ItemCompareDelegate<T>(T p1, T p2);
 
     public class DescendingProductComparer : IItemComparer<Product>
     {
@@ -393,17 +318,9 @@ namespace MyCollectionAPI
             }
             Console.ReadLine();
              * */
-
-            var book = new Product { Id = 100, Name = "Master C#", Cost = 1000, Units = 10, Category = "Stationary" };
-            Console.WriteLine(book);
-
-            //MyExtensions.ApplyDiscount(book, 10);
+            var numbers = new int[] { 10, 20, 30, 40 };
             
-            book.ApplyDiscount(10);
-
-            Console.WriteLine("After applying 10% discount");
-            Console.WriteLine(book);
-            Console.ReadLine();
+           
 
             var products = new MyCollection<Product>();
             products.Add(new Product { Id = 3, Name = "Pen", Cost = 5, Units = 50, Category = "Stationary" });
@@ -420,10 +337,12 @@ namespace MyCollectionAPI
             }
              * */
             Console.WriteLine("Default List");
+            /*
             foreach (var product in products)
             {
                 Console.WriteLine(product);
-            }
+            }*/
+            products.ForEach(product => Console.WriteLine(product));
             Console.WriteLine();
 
             Console.WriteLine("After sorting (By Id)");
@@ -465,7 +384,7 @@ namespace MyCollectionAPI
                 Console.WriteLine(product);
             }
             Console.WriteLine();
-            
+
 
             Console.WriteLine("All understocked products (units < 50)");
             //var understockedProducts = products.Filter(Program.IsUnderstocked);
@@ -481,7 +400,7 @@ namespace MyCollectionAPI
                 return product.Units < 50;
             });
              * */
-            var understockedProducts = products.Filter(product => product.Units < 50 );
+            var understockedProducts = products.Where(product => product.Units < 50);
             foreach (var product in understockedProducts)
             {
                 Console.WriteLine(product);
@@ -491,9 +410,10 @@ namespace MyCollectionAPI
             Console.WriteLine("Group By category");
             var productsByCategory = products.GroupBy(product => product.Category);
 
-            foreach(var groupedItem in productsByCategory){
+            foreach (var groupedItem in productsByCategory)
+            {
                 Console.WriteLine("Key - {0}", groupedItem.Key);
-                foreach (var item in groupedItem.Value)
+                foreach (var item in groupedItem)
                 {
                     Console.WriteLine(item);
                 }
@@ -506,7 +426,7 @@ namespace MyCollectionAPI
             foreach (var groupedItem in productsByCost)
             {
                 Console.WriteLine("Key - {0}", groupedItem.Key);
-                foreach (var item in groupedItem.Value)
+                foreach (var item in groupedItem)
                 {
                     Console.WriteLine(item);
                 }
@@ -523,6 +443,3 @@ namespace MyCollectionAPI
         */
     }
 }
-
-
-
