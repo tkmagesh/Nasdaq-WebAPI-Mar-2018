@@ -265,7 +265,6 @@ namespace MyCollectionAPI
 
         public IEnumerable<T>  Filter(ItemCriteriaDelegate<T> criteria)
         {
-            
             foreach (var item in this.list)
             {
                 var tItem = (T)item;
@@ -274,7 +273,26 @@ namespace MyCollectionAPI
             }
             
         }
+
+        public IDictionary<TKey, List<T>> GroupBy<TKey>(KeySelectorDelegate<T, TKey> keySelector)
+        {
+            var result = new Dictionary<TKey, List<T>>();
+            foreach (var item in this.list)
+            {
+                var tItem = (T)item;
+                var key = keySelector(tItem);
+                if (!result.ContainsKey(key))
+                {
+                    result.Add(key, new List<T>());
+                }
+                result[key].Add(tItem);
+            }
+            return result;
+        }
     }
+
+    public delegate TKey KeySelectorDelegate<T, TKey>(T item);
+
     public class CostlyProductCriteria : IItemCriteria<Product>
     {
 
@@ -450,6 +468,32 @@ namespace MyCollectionAPI
                 Console.WriteLine(product);
             }
             Console.WriteLine();
+
+            Console.WriteLine("Group By category");
+            var productsByCategory = products.GroupBy(product => product.Category);
+
+            foreach(var groupedItem in productsByCategory){
+                Console.WriteLine("Key - {0}", groupedItem.Key);
+                foreach (var item in groupedItem.Value)
+                {
+                    Console.WriteLine(item);
+                }
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Group By cost");
+            var productsByCost = products.GroupBy(product => product.Cost > 25 ? "costly" : "affordable");
+
+            foreach (var groupedItem in productsByCost)
+            {
+                Console.WriteLine("Key - {0}", groupedItem.Key);
+                foreach (var item in groupedItem.Value)
+                {
+                    Console.WriteLine(item);
+                }
+            }
+            Console.WriteLine();
+
             Console.ReadLine();
         }
         /*
