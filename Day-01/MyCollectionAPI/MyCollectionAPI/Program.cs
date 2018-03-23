@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -250,28 +251,28 @@ namespace MyCollectionAPI
                     }
                 }
         }
-        public MyCollection<T> Filter(IItemCriteria<T> criteria)
+        public IEnumerable<T> Filter(IItemCriteria<T> criteria)
         {
-            var result = new MyCollection<T>();
+            
             foreach (var item in this.list)
             {
                 var tItem = (T)item;
                 if (criteria.IsSatisfiedBy(tItem))
-                    result.Add(tItem);
+                    yield return tItem;
             }
-            return result;
+            
         }
 
-        public MyCollection<T> Filter(ItemCriteriaDelegate<T> criteria)
+        public IEnumerable<T>  Filter(ItemCriteriaDelegate<T> criteria)
         {
-            var result = new MyCollection<T>();
+            
             foreach (var item in this.list)
             {
                 var tItem = (T)item;
                 if (criteria(tItem))
-                    result.Add(tItem);
+                    yield return tItem;
             }
-            return result;
+            
         }
     }
     public class CostlyProductCriteria : IItemCriteria<Product>
