@@ -18,6 +18,8 @@ namespace MyCollectionAPI
             return String.Format("\t{0}\t{1}\t{2}\t{3}\t{4}\t", this.Id, this.Name, this.Cost, this.Units, this.Category);
         }
     }
+
+    /*
     public class ProductsCollection : IEnumerator, IEnumerable
     {
         private ArrayList list = new ArrayList();
@@ -30,12 +32,12 @@ namespace MyCollectionAPI
         {
             list.RemoveAt(index);
         }
-        /*
+        
         public Product Get(int index)
         {
             return (Product)list[index];
         }
-         * */
+        
         public Product this[int index]
         {
             get
@@ -151,8 +153,128 @@ namespace MyCollectionAPI
             return result;
         }
     }
+    */
 
-    public class CostlyProductCriteria : IProductCriteria
+    public class MyCollection<T> : IEnumerator, IEnumerable
+    {
+        private ArrayList list = new ArrayList();
+
+        public void Add(T item)
+        {
+            list.Add(item);
+        }
+        public void Remove(int index)
+        {
+            list.RemoveAt(index);
+        }
+
+        public T Get(int index)
+        {
+            return (T)list[index];
+        }
+
+        public T this[int index]
+        {
+            get
+            {
+                return (T)list[index];
+            }
+        }
+        public int Count
+        {
+            get
+            {
+                return list.Count;
+            }
+        }
+
+        //IEnumerable Members
+        private int index = -1;
+        public object Current
+        {
+            get { return this.list[this.index]; }
+        }
+
+        public bool MoveNext()
+        {
+            ++this.index;
+            if (this.index >= list.Count)
+            {
+                this.Reset();
+                return false;
+            }
+            return true;
+        }
+
+        public void Reset()
+        {
+            this.index = -1;
+        }
+
+        //IEnumerator Member
+        public IEnumerator GetEnumerator()
+        {
+            return this;
+        }
+
+       
+
+        public void Sort(IItemComparer<T> comparer)
+        {
+            for (var i = 0; i < this.list.Count - 1; i++)
+                for (var j = i + 1; j < this.list.Count; j++)
+                {
+                    var p1 = (T)this.list[i];
+                    var p2 = (T)this.list[j];
+                    if (comparer.Compare(p1, p2) > 0)
+                    {
+                        var temp = this.list[i];
+                        this.list[i] = this.list[j];
+                        this.list[j] = temp;
+                    }
+                }
+        }
+
+        public void Sort(ItemCompareDelegate<T> comparer)
+        {
+            for (var i = 0; i < this.list.Count - 1; i++)
+                for (var j = i + 1; j < this.list.Count; j++)
+                {
+                    var p1 = (T)this.list[i];
+                    var p2 = (T)this.list[j];
+                    if (comparer(p1, p2) > 0)
+                    {
+                        var temp = this.list[i];
+                        this.list[i] = this.list[j];
+                        this.list[j] = temp;
+                    }
+                }
+        }
+        public MyCollection<T> Filter(IItemCriteria<T> criteria)
+        {
+            var result = new MyCollection<T>();
+            foreach (var item in this.list)
+            {
+                var tItem = (T)item;
+                if (criteria.IsSatisfiedBy(tItem))
+                    result.Add(tItem);
+            }
+            return result;
+        }
+
+        public MyCollection<T> Filter(ItemCriteriaDelegate<T> criteria)
+        {
+            var result = new MyCollection<T>();
+            foreach (var item in this.list)
+            {
+                var tItem = (T)item;
+                if (criteria(tItem))
+                    result.Add(tItem);
+            }
+            return result;
+        }
+    }
+    public class CostlyProductCriteria : IItemCriteria<Product>
     {
 
         public bool IsSatisfiedBy(Product product)
@@ -161,7 +283,7 @@ namespace MyCollectionAPI
         }
     }
 
-    public class StationaryProductCriteria : IProductCriteria
+    public class StationaryProductCriteria : IItemCriteria<Product>
     {
         public bool IsSatisfiedBy(Product product)
         {
@@ -174,19 +296,33 @@ namespace MyCollectionAPI
     {
         bool IsSatisfiedBy(Product product);
     }
+
+    public interface IItemCriteria<T>
+    {
+        bool IsSatisfiedBy(T item);
+    }
     public delegate bool ProductCriteriaDelegate(Product product);
+
+    public delegate bool ItemCriteriaDelegate<T>(T item);
 
     public interface IProductComparer
     {
         int Compare(Product p1, Product p2);
     }
 
+    public interface IItemComparer<T>
+    {
+        int Compare(T p1, T p2);
+    }
+
     public delegate int ProductCompareDelegate(Product p1, Product p2);
 
-    public class DescendingProductComparer : IProductComparer
+    public delegate int ItemCompareDelegate<T>(T p1, T p2);
+
+    public class DescendingProductComparer : IItemComparer<Product>
     {
-        private IProductComparer _comparer = null;
-        public DescendingProductComparer(IProductComparer comparer)
+        private IItemComparer<Product> _comparer = null;
+        public DescendingProductComparer(IItemComparer<Product> comparer)
         {
             this._comparer = comparer;
         }
@@ -196,7 +332,7 @@ namespace MyCollectionAPI
         }
     }
 
-    public class ProductComparerById : IProductComparer
+    public class ProductComparerById : IItemComparer<Product>
     {
         public int Compare(Product p1, Product p2)
         {
@@ -205,7 +341,7 @@ namespace MyCollectionAPI
             return 1;
         }
     }
-    public class ProductComparerByCost : IProductComparer
+    public class ProductComparerByCost : IItemComparer<Product>
     {
         public int Compare(Product p1, Product p2)
         {
@@ -231,7 +367,7 @@ namespace MyCollectionAPI
             }
             Console.ReadLine();
              * */
-            var products = new ProductsCollection();
+            var products = new MyCollection<Product>();
             products.Add(new Product { Id = 3, Name = "Pen", Cost = 5, Units = 50, Category = "Stationary" });
             products.Add(new Product { Id = 5, Name = "Len", Cost = 50, Units = 30, Category = "Grocery" });
             products.Add(new Product { Id = 2, Name = "Ten", Cost = 10, Units = 60, Category = "Stationary" });

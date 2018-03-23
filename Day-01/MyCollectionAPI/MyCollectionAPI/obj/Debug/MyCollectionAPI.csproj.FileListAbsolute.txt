@@ -4,3 +4,9 @@ D:\Nasdaq-C#-Mar-2018\MyCollectionAPI\MyCollectionAPI\bin\Debug\MyCollectionAPI.
 D:\Nasdaq-C#-Mar-2018\MyCollectionAPI\MyCollectionAPI\obj\Debug\MyCollectionAPI.csprojResolveAssemblyReference.cache
 D:\Nasdaq-C#-Mar-2018\MyCollectionAPI\MyCollectionAPI\obj\Debug\MyCollectionAPI.exe
 D:\Nasdaq-C#-Mar-2018\MyCollectionAPI\MyCollectionAPI\obj\Debug\MyCollectionAPI.pdb
+D:\Nasdaq-WebAPI-Mar-2018\Day-01\MyCollectionAPI\MyCollectionAPI\bin\Debug\MyCollectionAPI.exe.config
+D:\Nasdaq-WebAPI-Mar-2018\Day-01\MyCollectionAPI\MyCollectionAPI\obj\Debug\MyCollectionAPI.exe
+D:\Nasdaq-WebAPI-Mar-2018\Day-01\MyCollectionAPI\MyCollectionAPI\obj\Debug\MyCollectionAPI.pdb
+D:\Nasdaq-WebAPI-Mar-2018\Day-01\MyCollectionAPI\MyCollectionAPI\obj\Debug\MyCollectionAPI.csprojResolveAssemblyReference.cache
+D:\Nasdaq-WebAPI-Mar-2018\Day-01\MyCollectionAPI\MyCollectionAPI\bin\Debug\MyCollectionAPI.exe
+D:\Nasdaq-WebAPI-Mar-2018\Day-01\MyCollectionAPI\MyCollectionAPI\bin\Debug\MyCollectionAPI.pdb
