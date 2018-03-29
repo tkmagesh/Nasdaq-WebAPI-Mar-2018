@@ -24,21 +24,26 @@ namespace MyApiProject.Controllers
             return data;
         }
 
-        public Product Get(int id)
+        public IHttpActionResult Get(int id)
         {
             var result = data.Find(product => product.Id == id);
+            
+            
             if (result != null)
-                return result;
+                return Ok(result);
+            /*
             var errorMessage = new HttpResponseMessage(HttpStatusCode.NotFound);
             errorMessage.Content = new StringContent("Invalid id");
-            errorMessage.ReasonPhrase = "Not Found";
-            throw new HttpResponseException(errorMessage);
+            errorMessage.ReasonPhrase = "Not Found
+             */
+            return StatusCode(HttpStatusCode.NotFound);
+            
         }
 
-        public Product Post(Product product)
+        public IHttpActionResult Post(Product product)
         {
             data.Add(product);
-            return product;
+            return Created<Product>("/products/" + product.Id, product);
         }
 
         public Product Put(int id, Product product)
