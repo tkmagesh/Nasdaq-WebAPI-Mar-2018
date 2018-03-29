@@ -3,12 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace MyCollectionAPI
 {
-    public class Product
+    public interface IPrintable
     {
+
+    }
+
+    public class NoPrintAttribute : Attribute
+    {
+
+    }
+    public class Product : IPrintable
+    {
+        [NoPrint]
         public int Id { get; set; }
+
+        
         public string Name { get; set; }
         public decimal Cost { get; set; }
         public int Units { get; set; }
@@ -16,7 +29,8 @@ namespace MyCollectionAPI
 
         public override string ToString()
         {
-            return String.Format("\t{0}\t{1}\t{2}\t{3}\t{4}\t", this.Id, this.Name, this.Cost, this.Units, this.Category);
+            //return String.Format("\t{0}\t{1}\t{2}\t{3}\t{4}\t", this.Id, this.Name, this.Cost, this.Units, this.Category);
+            return this.PrintableString();
         }
     }
 
@@ -25,6 +39,32 @@ namespace MyCollectionAPI
         public static void ApplyDiscount(this Product product, decimal percentage)
         {
             product.Cost = product.Cost - ((product.Cost * percentage) / 100);
+        }
+
+        public static string PrintableString(this IPrintable obj)
+        {
+
+            return obj
+               .GetType()
+               .GetProperties()
+               .Where(propInfo => !propInfo.GetCustomAttributes(typeof(NoPrintAttribute), false).Any())
+               .Aggregate(string.Empty, (result, propInfo) => result += propInfo.GetValue(obj) + "\t"); 
+
+            /*
+            var typeObj = obj.GetType();
+            var propInfos = typeObj.GetProperties();
+            var result = string.Empty;
+            foreach (var propInfo in propInfos)
+            {
+                var attrs = propInfo.GetCustomAttributes(typeof(NoPrintAttribute), false);
+                if (attrs.Length == 0)
+                {
+                    var value = propInfo.GetValue(obj);
+                    result += value.ToString() + "\t";
+                }
+            }
+            return result;
+             * */
         }
     }
     /*

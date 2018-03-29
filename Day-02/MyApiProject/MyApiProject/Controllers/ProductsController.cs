@@ -1,6 +1,8 @@
-﻿using MyApiProject.Models;
+﻿using MyApiProject.Filters;
+using MyApiProject.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,6 +10,7 @@ using System.Web.Http;
 
 namespace MyApiProject.Controllers
 {
+    [Time]
     public class ProductsController : ApiController
     {
         private static List<Product> data = new List<Product> {
@@ -21,6 +24,7 @@ namespace MyApiProject.Controllers
         [HttpGet]
         public IEnumerable<Product> GetProducts()
         {
+            Debug.WriteLine("ProductsController.GetProducts()");
             return data;
         }
 
