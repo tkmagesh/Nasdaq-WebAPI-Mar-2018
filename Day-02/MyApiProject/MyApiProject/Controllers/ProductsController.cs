@@ -42,11 +42,18 @@ namespace MyApiProject.Controllers
 
         public IHttpActionResult Post(Product product)
         {
-            data.Add(product);
-            return Created<Product>("/products/" + product.Id, product);
+            if (ModelState.IsValid)
+            {
+                data.Add(product);
+                return Created<Product>("/products/" + product.Id, product);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
         }
 
-        public Product Put(int id, Product product)
+        public Product Put([FromUri] int id, [FromBody] Product product)
         {
             var result = data.Find(productObj => productObj.Id == id);
             if (result == null)
